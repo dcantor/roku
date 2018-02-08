@@ -1,5 +1,5 @@
 import requests
-
+from xml.dom import minidom
 
 """This has been tested on a TCL Roku based TV.  
 Roku API is here:  https://sdkdocs.roku.com/display/sdkdoc/External+Control+API
@@ -31,8 +31,7 @@ def ask_user():
     print "7.  Netflix"
     print "8.  Hulu"
     print "9.  YouTube"
-    print "80. List all TV Channels"
-    print "81. List all Roku Apps Installed"
+    print "80. List all Roku Apps Installed"
     print "99. Quit"
 
     action = raw_input('Enter your selection:\n')
@@ -82,13 +81,18 @@ def perform_action():
         exit_status = 1
 
       elif action == "80":
-       r = requests.get(roku_url + '/query/tv-channels')
-       print r.content
-       exit_status = 1
-
-      elif action == "81":
        r = requests.get(roku_url + '/query/apps')
-       print r.content
+
+       mydoc = minidom.parseString(r.content)
+       items = mydoc.getElementsByTagName('app')
+
+       # Print all Roku Apps
+       print('\nRoku Apps Installed:')
+       for elem in items:
+           print(elem.firstChild.data)
+
+       print "\n"
+
        exit_status = 1
 
       elif action == "99":
